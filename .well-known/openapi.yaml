@@ -1,0 +1,139 @@
+openapi: 3.0.1
+info:
+  title: PubMed搜索API
+  description: 搜索PubMed上的医学和生物医学文章
+  version: 'v1'
+servers:
+  - url: https://your-server-url.com
+paths:
+  /api/search:
+    post:
+      operationId: searchPubMed
+      summary: 搜索PubMed文章
+      description: 根据查询词搜索PubMed上的医学和生物医学文章
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: 搜索查询词
+                maxResults:
+                  type: integer
+                  description: 返回的最大结果数量
+                  default: 10
+                sortBy:
+                  type: string
+                  description: 结果排序方式
+                  enum: [relevance, date]
+                  default: relevance
+      responses:
+        '200':
+          description: 成功返回搜索结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  articles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Article'
+        '400':
+          description: 无效请求
+        '500':
+          description: 服务器错误
+  /api/article/{id}:
+    get:
+      operationId: getArticleDetails
+      summary: 获取文章详情
+      description: 获取特定PubMed文章的详细信息
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubMed文章ID (PMID)
+      responses:
+        '200':
+          description: 成功返回文章详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  article:
+                    $ref: '#/components/schemas/ArticleDetail'
+        '404':
+          description: 文章未找到
+        '500':
+          description: 服务器错误
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: string
+          description: PubMed文章ID (PMID)
+        title:
+          type: string
+          description: 文章标题
+        authors:
+          type: string
+          description: 作者列表
+        journal:
+          type: string
+          description: 期刊名称
+        pubDate:
+          type: string
+          description: 发布日期
+        abstract:
+          type: string
+          description: 文章摘要
+        doi:
+          type: string
+          description: 数字对象标识符 (DOI)
+          nullable: true
+        url:
+          type: string
+          description: PubMed文章URL
+    ArticleDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: PubMed文章ID (PMID)
+        title:
+          type: string
+          description: 文章标题
+        authors:
+          type: string
+          description: 作者列表
+        journal:
+          type: string
+          description: 期刊名称
+        pubDate:
+          type: string
+          description: 发布日期
+        abstract:
+          type: string
+          description: 文章摘要
+        doi:
+          type: string
+          description: 数字对象标识符 (DOI)
+          nullable: true
+        keywords:
+          type: array
+          items:
+            type: string
+          description: 关键词列表
+        url:
+          type: string
+          description: PubMed文章URL
